@@ -21,7 +21,10 @@ import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Custom OIDC Claim handler to return permissions.
@@ -82,19 +85,18 @@ public class PermissionClaimHandler extends DefaultOIDCClaimsCallbackHandler {
 
             List<String> requestedClaimUris = getRequestedClaimUris(requestClaimMappings);
             AuthorizationManager authorizationManager = realm.getAuthorizationManager();
-            String[] permissionList = null;
+            Map<String, List<String>> permissionList = new HashMap<>();
             for (String claimUri : requestedClaimUris) {
                 if (claimUri.contains(PERMISSION_CLAIM)) {
                     String permissionRootPath = claimUri.replace("http://wso2.org/claims", "");
-                    permissionList =
-                            authorizationManager
-                                    .getAllowedUIResourcesForUser(MultitenantUtils.getTenantAwareUsername(userName),
-                                            permissionRootPath);
+                    permissionList.put(permissionRootPath,Arrays.asList(authorizationManager
+                            .getAllowedUIResourcesForUser(MultitenantUtils.getTenantAwareUsername(userName),
+                                    permissionRootPath)));
                 }
             }
 
-            if (ArrayUtils.isNotEmpty(permissionList)) {
-                jwtClaimsSetBuilder.claim("permission", permissionList);
+            if (!permissionList.isEmpty()) {
+                jwtClaimsSetBuilder.claim("permissions", permissionList);
             }
         } catch (IdentityApplicationManagementException e) {
             log.error(
