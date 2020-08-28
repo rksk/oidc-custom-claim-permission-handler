@@ -20,6 +20,7 @@ import org.wso2.carbon.user.api.AuthorizationManager;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -39,6 +40,9 @@ public class PermissionClaimHandler extends DefaultOIDCClaimsCallbackHandler {
     public JWTClaimsSet handleCustomClaims(JWTClaimsSet.Builder jwtClaimsSetBuilder, OAuthTokenReqMessageContext
             tokenReqMessageContext) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Handling custom claims in OAuth token request.");
+        }
         AuthenticatedUser authenticatedUser = tokenReqMessageContext.getAuthorizedUser();
         if (authenticatedUser == null) {
             log.error("Authenticated user not found.");
@@ -47,6 +51,10 @@ public class PermissionClaimHandler extends DefaultOIDCClaimsCallbackHandler {
             String userTenantDomain = authenticatedUser.getTenantDomain();
             String spTenantDomain = tokenReqMessageContext.getOauth2AccessTokenReqDTO().getTenantDomain();
             String clientId = tokenReqMessageContext.getOauth2AccessTokenReqDTO().getClientId();
+            if (log.isDebugEnabled()) {
+                log.debug("Handling custom claims for user: " + userName + " in tenant: " + userTenantDomain + " for " +
+                        "the SP: " + clientId + " in " + spTenantDomain + ".");
+            }
 
             handleUserPermissions(jwtClaimsSetBuilder, userName, userTenantDomain, spTenantDomain, clientId);
         }
@@ -57,6 +65,9 @@ public class PermissionClaimHandler extends DefaultOIDCClaimsCallbackHandler {
     public JWTClaimsSet handleCustomClaims(JWTClaimsSet.Builder jwtClaimsSetBuilder,
                                            OAuthAuthzReqMessageContext authzReqMessageContext) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Handling custom claims in Authorization request.");
+        }
         AuthenticatedUser authenticatedUser = authzReqMessageContext.getAuthorizationReqDTO().getUser();
         if (authenticatedUser == null) {
             log.error("Authenticated user not found.");
@@ -65,6 +76,10 @@ public class PermissionClaimHandler extends DefaultOIDCClaimsCallbackHandler {
             String userTenantDomain = authenticatedUser.getTenantDomain();
             String spTenantDomain = authzReqMessageContext.getAuthorizationReqDTO().getTenantDomain();
             String clientId = authzReqMessageContext.getAuthorizationReqDTO().getConsumerKey();
+            if (log.isDebugEnabled()) {
+                log.debug("Handling custom claims for user: " + userName + " in tenant: " + userTenantDomain + " for " +
+                        "the SP: " + clientId + " in " + spTenantDomain + ".");
+            }
 
             handleUserPermissions(jwtClaimsSetBuilder, userName, userTenantDomain, spTenantDomain, clientId);
         }
@@ -84,14 +99,34 @@ public class PermissionClaimHandler extends DefaultOIDCClaimsCallbackHandler {
             ClaimMapping[] requestClaimMappings = getRequestedClaimMappings(serviceProvider);
 
             List<String> requestedClaimUris = getRequestedClaimUris(requestClaimMappings);
+            if (log.isDebugEnabled()) {
+                if (requestedClaimUris.isEmpty()) {
+                    log.debug("Requested claim URIs not found.");
+                } else {
+                    log.debug("Requested claim URIs: " + requestedClaimUris.toString());
+                }
+            }
+
             AuthorizationManager authorizationManager = realm.getAuthorizationManager();
             Map<String, List<String>> permissionList = new HashMap<>();
             for (String claimUri : requestedClaimUris) {
                 if (claimUri.contains(PERMISSION_CLAIM)) {
                     String permissionRootPath = claimUri.replace("http://wso2.org/claims", "");
-                    permissionList.put(permissionRootPath,Arrays.asList(authorizationManager
+                    if (log.isDebugEnabled()) {
+                        log.debug("Retrieving permissions for " + permissionRootPath);
+                    }
+                    String[] permissions = authorizationManager
                             .getAllowedUIResourcesForUser(MultitenantUtils.getTenantAwareUsername(userName),
-                                    permissionRootPath)));
+                                    permissionRootPath);
+                    if (log.isDebugEnabled()) {
+                        if (ArrayUtils.isEmpty(permissions)) {
+                            log.debug("Permission list is empty for " + permissionRootPath);
+                        } else {
+                            log.debug("Retrieved permission list for " + permissionRootPath + ": " +
+                                    Arrays.asList(permissions));
+                        }
+                    }
+                    permissionList.put(permissionRootPath, Arrays.asList(permissions));
                 }
             }
 
