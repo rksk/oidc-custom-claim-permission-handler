@@ -11,6 +11,7 @@ import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
 import org.wso2.carbon.identity.base.IdentityException;
 import org.wso2.carbon.identity.core.util.IdentityTenantUtil;
+import org.wso2.carbon.identity.oauth2.IdentityOAuth2Exception;
 import org.wso2.carbon.identity.oauth2.authz.OAuthAuthzReqMessageContext;
 import org.wso2.carbon.identity.oauth2.internal.OAuth2ServiceComponentHolder;
 import org.wso2.carbon.identity.oauth2.token.OAuthTokenReqMessageContext;
@@ -37,8 +38,9 @@ public class PermissionClaimHandler extends DefaultOIDCClaimsCallbackHandler {
     private static final String OAUTH2 = "oauth2";
 
     @Override
-    public JWTClaimsSet handleCustomClaims(JWTClaimsSet.Builder jwtClaimsSetBuilder, OAuthTokenReqMessageContext
-            tokenReqMessageContext) {
+    public JWTClaimsSet handleCustomClaims(JWTClaimsSet.Builder jwtClaimsSetBuilder,
+                                           OAuthTokenReqMessageContext tokenReqMessageContext)
+            throws IdentityOAuth2Exception {
 
         if (log.isDebugEnabled()) {
             log.debug("Handling custom claims in OAuth token request.");
@@ -63,7 +65,8 @@ public class PermissionClaimHandler extends DefaultOIDCClaimsCallbackHandler {
 
     @Override
     public JWTClaimsSet handleCustomClaims(JWTClaimsSet.Builder jwtClaimsSetBuilder,
-                                           OAuthAuthzReqMessageContext authzReqMessageContext) {
+                                           OAuthAuthzReqMessageContext authzReqMessageContext)
+            throws IdentityOAuth2Exception {
 
         if (log.isDebugEnabled()) {
             log.debug("Handling custom claims in Authorization request.");
