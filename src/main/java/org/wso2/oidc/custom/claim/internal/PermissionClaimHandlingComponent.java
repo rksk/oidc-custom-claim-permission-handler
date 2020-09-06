@@ -6,7 +6,7 @@ import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.user.core.service.RealmService;
 
 /**
- * @scr.component name="custom.permission.claim.handler"
+ * @scr.component name="org.wso2.oidc.custom.claim.handler"
  * immediate="true"
  * @scr.reference name="user.realmservice.default"
  * interface="org.wso2.carbon.user.core.service.RealmService"
