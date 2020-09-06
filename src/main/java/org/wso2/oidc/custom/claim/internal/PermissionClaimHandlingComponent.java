@@ -1,4 +1,4 @@
-package org.wso2.custom.claim.internal;
+package org.wso2.oidc.custom.claim.internal;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

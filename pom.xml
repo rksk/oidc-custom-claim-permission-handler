@@ -2,8 +2,8 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.wso2.custom.claim</groupId>
-  <artifactId>org.wso2.permission.claim.handler</artifactId>
+  <groupId>org.wso2.oidc.custom.claim</groupId>
+  <artifactId>org.wso2.oidc.custom.claim.handler</artifactId>
   <version>1.0</version>
   <packaging>bundle</packaging>
   <name>org.wso2.permission.claim.handler</name>
@@ -40,14 +40,14 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
-                        <Bundle-Name>${pom.artifactId}</Bundle-Name>
+                        <Bundle-SymbolicName>${artifactId}</Bundle-SymbolicName>
+                        <Bundle-Name>${artifactId}</Bundle-Name>
                         <Private-Package>
-                            org.wso2.custom.claim.internal
+                            org.wso2.oidc.custom.claim.internal
                         </Private-Package>
                         <Export-Package>
-                            !org.wso2.custom.claim.internal,
-                            org.wso2.custom.claim.*,
+                            !org.wso2.oidc.custom.claim.internal,
+                            org.wso2.oidc.custom.claim.*,
                         </Export-Package>
                         <Import-Package>
                             org.osgi.framework; version="${osgi.framework.imp.pkg.version.range}",

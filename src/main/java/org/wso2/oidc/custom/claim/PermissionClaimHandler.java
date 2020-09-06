@@ -1,4 +1,4 @@
-package org.wso2.custom.claim;
+package org.wso2.oidc.custom.claim;
 
 import com.nimbusds.jwt.JWTClaimsSet;
 import org.apache.commons.lang.ArrayUtils;
@@ -39,8 +39,7 @@ public class PermissionClaimHandler extends DefaultOIDCClaimsCallbackHandler {
 
     @Override
     public JWTClaimsSet handleCustomClaims(JWTClaimsSet.Builder jwtClaimsSetBuilder,
-                                           OAuthTokenReqMessageContext tokenReqMessageContext)
-            throws IdentityOAuth2Exception {
+                                           OAuthTokenReqMessageContext tokenReqMessageContext) {
 
         if (log.isDebugEnabled()) {
             log.debug("Handling custom claims in OAuth token request.");
@@ -65,8 +64,7 @@ public class PermissionClaimHandler extends DefaultOIDCClaimsCallbackHandler {
 
     @Override
     public JWTClaimsSet handleCustomClaims(JWTClaimsSet.Builder jwtClaimsSetBuilder,
-                                           OAuthAuthzReqMessageContext authzReqMessageContext)
-            throws IdentityOAuth2Exception {
+                                           OAuthAuthzReqMessageContext authzReqMessageContext) {
 
         if (log.isDebugEnabled()) {
             log.debug("Handling custom claims in Authorization request.");
