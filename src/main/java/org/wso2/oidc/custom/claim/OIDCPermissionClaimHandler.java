@@ -21,7 +21,6 @@ import org.wso2.carbon.user.api.AuthorizationManager;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -31,15 +30,15 @@ import java.util.Map;
 /**
  * Custom OIDC Claim handler to return permissions.
  */
-public class PermissionClaimHandler extends DefaultOIDCClaimsCallbackHandler {
+public class OIDCPermissionClaimHandler extends DefaultOIDCClaimsCallbackHandler {
 
     private static final String PERMISSION_CLAIM = "http://wso2.org/claims/permission";
-    private static final Log log = LogFactory.getLog(PermissionClaimHandler.class);
+    private static final Log log = LogFactory.getLog(OIDCPermissionClaimHandler.class);
     private static final String OAUTH2 = "oauth2";
 
     @Override
     public JWTClaimsSet handleCustomClaims(JWTClaimsSet.Builder jwtClaimsSetBuilder,
-                                           OAuthTokenReqMessageContext tokenReqMessageContext) {
+                                           OAuthTokenReqMessageContext tokenReqMessageContext) throws IdentityOAuth2Exception{
 
         if (log.isDebugEnabled()) {
             log.debug("Handling custom claims in OAuth token request.");
@@ -64,7 +63,7 @@ public class PermissionClaimHandler extends DefaultOIDCClaimsCallbackHandler {
 
     @Override
     public JWTClaimsSet handleCustomClaims(JWTClaimsSet.Builder jwtClaimsSetBuilder,
-                                           OAuthAuthzReqMessageContext authzReqMessageContext) {
+                                           OAuthAuthzReqMessageContext authzReqMessageContext) throws IdentityOAuth2Exception{
 
         if (log.isDebugEnabled()) {
             log.debug("Handling custom claims in Authorization request.");
