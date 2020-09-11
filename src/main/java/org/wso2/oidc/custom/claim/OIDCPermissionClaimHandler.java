@@ -221,16 +221,13 @@ public class OIDCPermissionClaimHandler extends DefaultOIDCClaimsCallbackHandler
                                                                 UserRealm realm) {
 
         Map<String, List<String>> permissionList = new HashMap<>();
-        Set<String> superAdminPermissionList = new HashSet<>();
-        Set<String> adminPermissionList = new HashSet<>();
-        Set<String> applicationPermissionList = new HashSet<>();
-        Set<String> otherPermissionList = new HashSet<>();
 
         try {
             AuthorizationManager authorizationManager = realm.getAuthorizationManager();
 
             for (String claimUri : userClaimsInOidcDialect) {
                 if (claimUri.contains(PERMISSION_CLAIM)) {
+                    Set<String> leafPermission = new HashSet<>();
                     String permissionRootPath = claimUri.replace(LOCAL_DIALECT, "");
                     if (log.isDebugEnabled()) {
                         log.debug("Retrieving permissions for " + permissionRootPath);
@@ -238,41 +235,23 @@ public class OIDCPermissionClaimHandler extends DefaultOIDCClaimsCallbackHandler
                     String[] permissions = authorizationManager
                             .getAllowedUIResourcesForUser(MultitenantUtils.getTenantAwareUsername(userName),
                                     permissionRootPath);
-                    if (log.isDebugEnabled()) {
-                        if (ArrayUtils.isEmpty(permissions)) {
+
+                    if (ArrayUtils.isEmpty(permissions)) {
+                        if (log.isDebugEnabled()) {
                             log.debug("Permission list is empty for " + permissionRootPath);
-                        } else {
+                        }
+                    } else {
+                        if (log.isDebugEnabled()) {
                             log.debug("Retrieved permission list for " + permissionRootPath + ": " +
                                     Arrays.asList(permissions));
                         }
-                    }
-
-                    for (String permission : permissions) {
-                        if (permission.contains(SUPER_ADMIN_PERMISSION_PATH)) {
-                            superAdminPermissionList.add(getPermissionLeaf(SUPER_ADMIN_PERMISSION_PATH, permission));
-                        } else if (permission.contains(ADMIN_PERMISSION_PATH)) {
-                            adminPermissionList.add(getPermissionLeaf(ADMIN_PERMISSION_PATH, permission));
-                        } else if (permission.contains(APPLICATION_PERMISSION_PATH)) {
-                            applicationPermissionList.add(getPermissionLeaf(APPLICATION_PERMISSION_PATH, permission));
-                        } else {
-                            otherPermissionList.add(getPermissionLeaf(PERMISSION_PATH, permission));
+                        for (String permission : permissions) {
+                            leafPermission.add(getPermissionLeaf(permissionRootPath, permission));
                         }
+                        permissionList.put(permissionRootPath, new ArrayList<>(leafPermission));
                     }
                 }
             }
-            if (!superAdminPermissionList.isEmpty()) {
-                permissionList.put(SUPER_ADMIN_PERMISSION, new ArrayList<>(superAdminPermissionList));
-            }
-            if (!adminPermissionList.isEmpty()) {
-                permissionList.put(ADMIN_PERMISSION, new ArrayList<>(adminPermissionList));
-            }
-            if (!applicationPermissionList.isEmpty()) {
-                permissionList.put(APPLICATION_PERMISSION, new ArrayList<>(applicationPermissionList));
-            }
-            if (!otherPermissionList.isEmpty()) {
-                permissionList.put(OTHER_PERMISSION, new ArrayList<>(otherPermissionList));
-            }
-
         } catch (UserStoreException e) {
             log.error("Error while retrieving user claim in local dialect for user: " + userName, e);
         }
